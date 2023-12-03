@@ -1,13 +1,12 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import healthCheckEndpoint from "./health-check-endpoint";
 
 console.log("Starting server...");
 
 const app = express();
 const port = parseInt(process.env.PORT ?? "3000", 10);
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
-});
+app.get("/health-check", healthCheckEndpoint);
 
 const server = app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
