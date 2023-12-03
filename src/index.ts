@@ -9,6 +9,15 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
+});
+
+["SIGTERM", "SIGINT"].forEach((signal) => {
+  process.on(signal, () => {
+    console.log(`${signal} received: closing server`);
+    server.close(() => {
+      console.log("server closed");
+    });
+  });
 });
