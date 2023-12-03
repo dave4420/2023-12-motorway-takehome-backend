@@ -1,12 +1,12 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response } from "express";
 
-console.log('Starting server...');
+console.log("Starting server...");
 
 const app = express();
-const port = parseInt(process.env.PORT ?? '3000', 10);
+const port = parseInt(process.env.PORT ?? "3000", 10);
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Express + TypeScript Server');
+app.get("/", (req: Request, res: Response) => {
+  res.send("Express + TypeScript Server");
 });
 
 app.listen(port, () => {
