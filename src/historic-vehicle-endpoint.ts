@@ -1,12 +1,12 @@
 import { jsonEndpoint } from "./express-utils";
 import { Request } from "express";
 
-interface Input {
+export interface Input {
   readonly vehicleId: number;
   readonly when: string;
 }
 
-type Output = null | {
+export type Output = null | {
   readonly vehicleId: number;
   readonly make: string;
   readonly model: string;
@@ -18,7 +18,18 @@ export const parseRequest = (req: Request): Input => {
 };
 
 export const renderResponse = (output: Output) => {
-  throw Error("DAVE");
+  if (output === null) {
+    return {
+      status: 410,
+      headers: {},
+      body: { error: "Vehicle not found" },
+    };
+  }
+  return {
+    status: 200,
+    headers: {},
+    body: output,
+  };
 };
 
 export default jsonEndpoint<Input, Output>({
