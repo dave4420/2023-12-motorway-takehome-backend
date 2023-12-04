@@ -31,29 +31,34 @@ export const jsonEndpoint =
   <Input, Output>(endpoint: JsonEndpoint<Input, Output>) =>
   (deps: Dependencies) =>
   async (req: Request, res: Response): Promise<void> => {
-    const getResponseNoThrow = async () => {
-      try {
-        const input = endpoint.parseRequest(req, deps);
-        const output = await endpoint.handler(input, deps);
-        return endpoint.renderResponse(output, deps);
-      } catch (error) {
-        deps.log.error(
-          { error: errorFields(error) },
-          "Caught error in jsonEndpoint, returning internal server error",
-        );
-        return {
-          status: 500,
-          headers: {},
-          body: { error: "Internal server error" },
-        };
-      }
+    const respond = ({ status, headers, body }: SmallResponse<object>) => {
+      const actualHeaders = {
+        ...endpoint.defaultHeaders,
+        ...headers,
+      };
+      res.status(status);
+      res.set(actualHeaders);
+      res.json(body);
     };
-    const { status, headers, body } = await getResponseNoThrow();
-    const actualHeaders = {
-      ...endpoint.defaultHeaders,
-      ...headers,
-    };
-    res.status(status);
-    res.set(actualHeaders);
-    res.json(body);
+
+    try {
+      const input = endpoint.parseRequest(req, deps);
+      const output = await endpoint.handler(input, deps);
+      const response = endpoint.renderResponse(output, deps);
+      respond(response);
+      deps.log.info(
+        { status: response.status },
+        "jsonEndpoint completed normally",
+      );
+    } catch (error) {
+      respond({
+        status: 500,
+        headers: {},
+        body: { error: "Internal server error" },
+      });
+      deps.log.error(
+        { error: errorFields(error), status: 500 },
+        "Caught error in jsonEndpoint, returning internal server error",
+      );
+    }
   };
