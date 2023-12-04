@@ -1,14 +1,29 @@
 import { Request, Response } from "express";
 import { Dependencies } from "./dependencies";
 
-interface SmallResponse<Payload> {
+export interface SmallResponse<Payload> {
   readonly status: number;
   readonly headers: { readonly [key: string]: string };
   readonly body: Payload;
 }
 
-interface JsonEndpoint<Input, Output> {
-  readonly parseRequest: (req: Request, deps: Dependencies) => Input;
+export interface ProceedToHandler<Input> {
+  readonly state: "proceed";
+  readonly input: Input;
+}
+
+export interface SkipHandler {
+  readonly state: "skip";
+  readonly response: SmallResponse<object>;
+}
+
+export type ParsedRequest<Input> = ProceedToHandler<Input> | SkipHandler;
+
+export interface JsonEndpoint<Input, Output> {
+  readonly parseRequest: (
+    req: Request,
+    deps: Dependencies,
+  ) => ParsedRequest<Input>;
   readonly renderResponse: (
     output: Output,
     deps: Dependencies,
@@ -41,10 +56,20 @@ export const jsonEndpoint =
       res.json(body);
     };
 
+    const handleRequest = async (parsed: ParsedRequest<Input>) => {
+      switch (parsed.state) {
+        case "proceed":
+          return endpoint.renderResponse(
+            await endpoint.handler(parsed.input, deps),
+            deps,
+          );
+        case "skip":
+          return parsed.response;
+      }
+    };
+
     try {
-      const input = endpoint.parseRequest(req, deps);
-      const output = await endpoint.handler(input, deps);
-      const response = endpoint.renderResponse(output, deps);
+      const response = await handleRequest(endpoint.parseRequest(req, deps));
       respond(response);
       deps.log.info(
         { status: response.status },

@@ -1,4 +1,4 @@
-import { jsonEndpoint } from "./express-utils";
+import { SkipHandler, jsonEndpoint } from "./express-utils";
 
 export const renderResponse = () => ({
   status: 200,
@@ -6,9 +6,14 @@ export const renderResponse = () => ({
   body: { status: "ok" },
 });
 
-export default jsonEndpoint<null, null>({
-  parseRequest: () => null,
+export const parseRequest = (): SkipHandler => ({
+  state: "skip",
+  response: renderResponse(),
+});
+
+export default jsonEndpoint<never, never>({
+  parseRequest,
   renderResponse,
   defaultHeaders: {},
-  handler: () => Promise.resolve(null),
+  handler: (input) => Promise.resolve(input),
 });

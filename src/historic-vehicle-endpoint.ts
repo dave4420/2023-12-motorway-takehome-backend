@@ -1,4 +1,4 @@
-import { jsonEndpoint } from "./express-utils";
+import { ParsedRequest, jsonEndpoint } from "./express-utils";
 import { Request } from "express";
 
 export interface Input {
@@ -13,7 +13,7 @@ export type Output = null | {
   readonly state: string | null;
 };
 
-export const parseRequest = (req: Request): Input => {
+export const parseRequest = (req: Request): ParsedRequest<Input> => {
   throw Error("DAVE");
 };
 
