@@ -35,7 +35,9 @@ export const renderResponse = (output: Output) => {
 export default jsonEndpoint<Input, Output>({
   parseRequest,
   renderResponse,
-  defaultHeaders: {},
+  defaultHeaders: {
+    "Cache-Control": "public, max-age=60",
+  },
   handler: async () => {
     throw Error("DAVE");
   },
