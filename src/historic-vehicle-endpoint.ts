@@ -14,7 +14,24 @@ export type Output = null | {
 };
 
 export const parseRequest = (req: Request): ParsedRequest<Input> => {
-  throw Error("DAVE");
+  const vehicleId = parseInt(req.params.vehicleId, 10);
+  if (typeof vehicleId !== "number" || isNaN(vehicleId)) {
+    return {
+      state: "skip",
+      response: {
+        status: 400,
+        headers: {},
+        body: { error: "Vehicle ID was not supplied" },
+      },
+    };
+  }
+  return {
+    state: "proceed",
+    input: {
+      vehicleId,
+      when: "DAVE",
+    },
+  };
 };
 
 export const renderResponse = (output: Output) => {
