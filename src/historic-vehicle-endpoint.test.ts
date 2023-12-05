@@ -4,6 +4,7 @@ import {
   Output,
 } from "./historic-vehicle-endpoint";
 import { Request } from "express";
+import { Instant } from "@js-joda/core";
 
 describe("parseRequest", () => {
   describe("the vehicleId path parameter", () => {
@@ -71,10 +72,88 @@ describe("parseRequest", () => {
   });
 
   describe("the when path parameter", () => {
-    it.todo("is extracted when the T is present");
-    it.todo("is extracted when the T is not present");
-    it.todo("is required");
-    it.todo("is an error if it doesn’t parse");
+    it("is extracted when the T is present", () => {
+      // given
+      const req = {
+        params: {
+          vehicleId: "123",
+          when: "2021-01-01T00:00:00Z",
+        },
+      } as unknown as Request;
+
+      // when
+      const parsed = parseRequest(req);
+
+      // then
+      expect(parsed).toEqual({
+        state: "proceed",
+        input: expect.objectContaining({
+          when: Instant.parse("2021-01-01T00:00:00Z"),
+        }),
+      });
+    });
+
+    it("is extracted when the T is not present", () => {
+      // given
+      const req = {
+        params: {
+          vehicleId: "123",
+          when: "2021-01-01 00:00:00Z",
+        },
+      } as unknown as Request;
+
+      // when
+      const parsed = parseRequest(req);
+
+      // then
+      expect(parsed).toEqual({
+        state: "proceed",
+        input: expect.objectContaining({
+          when: Instant.parse("2021-01-01T00:00:00Z"),
+        }),
+      });
+    });
+
+    it("is required", () => {
+      // given
+      const req = {
+        params: {
+          vehicleId: "123",
+        },
+      } as unknown as Request;
+
+      // when
+      const parsed = parseRequest(req);
+
+      // then
+      expect(parsed).toEqual({
+        state: "skip",
+        response: expect.objectContaining({
+          status: 400,
+        }),
+      });
+    });
+
+    it("is an error if it doesn’t parse", () => {
+      // given
+      const req = {
+        params: {
+          vehicleId: "123",
+          when: "last christmas",
+        },
+      } as unknown as Request;
+
+      // when
+      const parsed = parseRequest(req);
+
+      // then
+      expect(parsed).toEqual({
+        state: "skip",
+        response: expect.objectContaining({
+          status: 400,
+        }),
+      });
+    });
   });
 });
 
