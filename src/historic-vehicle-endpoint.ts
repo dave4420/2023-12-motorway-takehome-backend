@@ -1,6 +1,7 @@
 import { ParsedRequest, jsonEndpoint } from "./express-utils";
 import { Request } from "express";
 import { z } from "zod";
+import { fromZodError } from "zod-validation-error";
 
 export interface Input {
   readonly vehicleId: number;
@@ -29,8 +30,7 @@ export const parseRequest = (req: Request): ParsedRequest<Input> => {
         status: 400,
         headers: {},
         body: {
-          error:
-            "DAVE: extract vaidation failures from parsed.error (ZodError)",
+          error: fromZodError(parsed.error).message,
         },
       },
     };
