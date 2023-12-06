@@ -11,3 +11,7 @@ services:
       - POSTGRES_DB=motorway
     ports:
       - 5432:5432
+    healthcheck:
+      test: PGPASSWORD=password psql -e -U user -d motorway -c 'SELECT 1'
+      interval: 1s
+      start_period: 1m
