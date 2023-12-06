@@ -17,10 +17,22 @@ export type Output = null | {
   readonly state: string | null;
 };
 
+const zonedDateTime = z.preprocess((val) => {
+  // change first ' ' to 'T', if present
+  if (typeof val !== "string") {
+    return val;
+  }
+  const index = val.indexOf(" ");
+  if (index === -1) {
+    return val;
+  }
+  return val.substring(0, index) + "T" + val.substring(index + 1);
+}, zj.zonedDateTime());
+
 const schema = z.object({
   params: z.object({
     vehicleId: z.coerce.number(),
-    when: zj.zonedDateTime(),
+    when: zonedDateTime,
   }),
 });
 
