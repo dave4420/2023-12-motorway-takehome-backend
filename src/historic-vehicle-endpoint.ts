@@ -2,10 +2,12 @@ import { ParsedRequest, jsonEndpoint } from "./express-utils";
 import { Request } from "express";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { Instant } from "@js-joda/core";
+import { zj } from "zod-joda";
 
 export interface Input {
   readonly vehicleId: number;
-  readonly when: string;
+  readonly when: Instant;
 }
 
 export type Output = null | {
@@ -18,6 +20,7 @@ export type Output = null | {
 const schema = z.object({
   params: z.object({
     vehicleId: z.coerce.number(),
+    when: zj.zonedDateTime(),
   }),
 });
 
@@ -39,7 +42,7 @@ export const parseRequest = (req: Request): ParsedRequest<Input> => {
     state: "proceed",
     input: {
       vehicleId: parsed.data.params.vehicleId,
-      when: "DAVE",
+      when: parsed.data.params.when.toInstant(),
     },
   };
 };
