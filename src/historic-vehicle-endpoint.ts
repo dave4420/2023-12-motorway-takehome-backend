@@ -1,5 +1,6 @@
 import { ParsedRequest, jsonEndpoint } from "./express-utils";
 import { Request } from "express";
+import { z } from "zod";
 
 export interface Input {
   readonly vehicleId: number;
@@ -13,22 +14,31 @@ export type Output = null | {
   readonly state: string | null;
 };
 
+const schema = z.object({
+  params: z.object({
+    vehicleId: z.coerce.number(),
+  }),
+});
+
 export const parseRequest = (req: Request): ParsedRequest<Input> => {
-  const vehicleId = parseInt(req.params.vehicleId, 10);
-  if (typeof vehicleId !== "number" || isNaN(vehicleId)) {
+  const parsed = schema.safeParse(req);
+  if (!parsed.success) {
     return {
       state: "skip",
       response: {
         status: 400,
         headers: {},
-        body: { error: "Vehicle ID was not supplied" },
+        body: {
+          error:
+            "DAVE: extract vaidation failures from parsed.error (ZodError)",
+        },
       },
     };
   }
   return {
     state: "proceed",
     input: {
-      vehicleId,
+      vehicleId: parsed.data.params.vehicleId,
       when: "DAVE",
     },
   };
