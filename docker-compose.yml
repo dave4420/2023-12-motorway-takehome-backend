@@ -26,6 +26,6 @@ services:
       - PGPASSWORD=password
       - PGUSER=user
       - PGDATABASE=motorway
-      - PGHOST=localhost
+      - PGHOST=db
     ports:
       - 3000:3000
