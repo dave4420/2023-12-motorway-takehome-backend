@@ -47,7 +47,7 @@ class Postgres implements Database {
                     ORDER BY timestamp DESC
                 )
             SELECT v.make, v.model, e.state
-            FROM vehicles v RIGHT JOIN events e ON v.id = e.vehicle_id, params
+            FROM vehicles v LEFT JOIN events e ON v.id = e.vehicle_id, params
             WHERE v.id = params.vehicle_id
             LIMIT 1
         `,
