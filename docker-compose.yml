@@ -15,3 +15,17 @@ services:
       test: PGPASSWORD=password psql -e -U user -d motorway -c 'SELECT 1'
       interval: 1s
       start_period: 1m
+
+  api:
+    image: motorway-test-app-server
+    init: true
+    build:
+      context: .
+      target: motorway-test-app-server
+    environment:
+      - PGPASSWORD=password
+      - PGUSER=user
+      - PGDATABASE=motorway
+      - PGHOST=localhost
+    ports:
+      - 3000:3000
