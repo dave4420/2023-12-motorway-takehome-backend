@@ -4,7 +4,7 @@ import express from "express";
 import healthCheckEndpoint from "./health-check-endpoint";
 import historicVehicleEndpoint from "./historic-vehicle-endpoint";
 
-interface App {
+export interface App {
   shutdown(): void;
 }
 
