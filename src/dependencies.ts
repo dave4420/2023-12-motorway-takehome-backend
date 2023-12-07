@@ -1,4 +1,4 @@
-import pino, { Logger, LoggerOptions } from "pino";
+import { Logger, LoggerOptions } from "pino";
 import { Database, connectToPostgres } from "./postgres";
 
 export interface Dependencies {
@@ -6,9 +6,9 @@ export interface Dependencies {
   readonly db: Database;
 }
 
-export const buildDependencies = (): Dependencies => {
+export const buildDependencies = (log: Logger<LoggerOptions>): Dependencies => {
   return {
-    log: pino(),
+    log,
     db: connectToPostgres(),
   };
 };
