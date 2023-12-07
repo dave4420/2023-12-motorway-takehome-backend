@@ -33,6 +33,9 @@ export interface JsonEndpoint<Input, Output> {
 }
 
 const errorFields = (error: any): any => {
+  if (error instanceof AggregateError) {
+    return error.errors.map(errorFields);
+  }
   if (error instanceof Error) {
     return {
       message: error.message,
