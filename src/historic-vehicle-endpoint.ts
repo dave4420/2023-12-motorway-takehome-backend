@@ -80,7 +80,7 @@ export default jsonEndpoint<Input, Output>({
   defaultHeaders: {
     "Cache-Control": "public, max-age=60",
   },
-  handler: async () => {
-    throw Error("DAVE");
+  handler: async (input, deps) => {
+    return await deps.db.getHistoricVehicle(input);
   },
 });
